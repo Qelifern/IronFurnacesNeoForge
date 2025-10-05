@@ -1815,7 +1815,7 @@ public abstract class BlockIronFurnaceTileBase extends TileEntityInventory imple
             owner = tag.getUUID("Owner");
         }
 
-        tag.getBoolean("RainbowGen");
+        rainbowGenerating = tag.getBoolean("RainbowGen");
 
         for (int i = 0; i < factoryCookTime.length; i++) {
             int[] tagArr = tag.getIntArray("FactoryCookTime");
