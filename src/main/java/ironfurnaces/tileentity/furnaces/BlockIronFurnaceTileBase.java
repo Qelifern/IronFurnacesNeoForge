@@ -1214,6 +1214,9 @@ public abstract class BlockIronFurnaceTileBase extends TileEntityInventory imple
     }
 
     protected void energyOut() {
+        if (getEnergy() <= 0 || energyStorage.getMaxExtract() <= 0) {
+            return;
+        }
 
         Map<BlockEntity, Direction> tiles = Maps.newHashMap();
         for (Direction dir : Direction.values()) {
@@ -1226,19 +1229,22 @@ public abstract class BlockIronFurnaceTileBase extends TileEntityInventory imple
                 if (other == null) {
                     continue;
                 }
-                if (other.canReceive() && other.getEnergyStored() < other.getMaxEnergyStored()) {
-
+                if (other.canReceive()) {
                     tiles.put(tile, dir.getOpposite());
                 }
             }
         }
         for (Map.Entry<BlockEntity, Direction> entry : tiles.entrySet()) {
-            IEnergyStorage other = level.getCapability(Capabilities.EnergyStorage.BLOCK, entry.getKey().getBlockPos(), entry.getValue());
             int energy = Math.min(energyStorage.getMaxExtract(), getEnergy());
-            if (other != null)
-            {
-                removeEnergy(other.receiveEnergy(energy, false));
-
+            if (energy <= 0) {
+                break;
+            }
+            IEnergyStorage other = level.getCapability(Capabilities.EnergyStorage.BLOCK, entry.getKey().getBlockPos(), entry.getValue());
+            if (other != null) {
+                int accepted = other.receiveEnergy(energy, false);
+                if (accepted > 0) {
+                    removeEnergy(accepted);
+                }
             }
         }
     }
